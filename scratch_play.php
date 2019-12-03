@@ -28,8 +28,8 @@
 <button id="f" title="fullscreen"></button>
 
 
-
-
+<script src="./js/vm.min.js"></script>
+<script src="./js/play_scratch.js"></script>
 <script type="text/javascript" id="j">
 
 
@@ -44,47 +44,28 @@ else
 //檔名   只能為英數 -_ 字元
 if (preg_match( '/^([0-9a-z-_]*)\.sb([2-3]?)$/i', $_GET['sb'])  ){
     $sb_file =$_GET['sb'] ;
-    //echo $sb_file ;
+
 }else
     $sb_file ='sample.sb3' ;
+
+    $sb3_base64 =base64_encode( file_get_contents("sb/" . $sb_file) );
+
 ?>
-var sb_file = "sb/<?php echo $sb_file ?>" ;
-
-
-
-
+//直接放入資料內容，載入比較快
+var FILE= "data:application/octet-stream;base64,<?php echo $sb3_base64  ;  ?>"   ;
 
 var DESIRED_USERNAME = "griffpatch",COMPAT = true, TURBO = false;
 var SRC = "file" ;
 
-
-var request = new XMLHttpRequest();
-request.open('GET', sb_file, true);
-request.responseType = 'blob';
-request.onload = function() {
-    const  reader = new FileReader();
-    reader.readAsDataURL(request.response);
-    reader.onload =  function(e){
-        //console.log('DataURL:', e.target.result);
-        //FILE = "data:application/octet-stream;base64,"+ e.target.result   ;
-        console.log('read sb3 data ok ');
-        var FILE =   e.target.result   ;
-
-        if (SRC === 'file') {
-
-              fetch(FILE)
-                .then(r => r.arrayBuffer())
-                .then(b => Scratch.vm.loadProject(b));
-            } else {
-              Scratch.vm.downloadProjectId('');
-            }
-    };
-};
-request.send();
+if (SRC === 'file') {
+  fetch(FILE)
+    .then(r => r.arrayBuffer())
+    .then(b => Scratch.vm.loadProject(b));
+} else {
+  Scratch.vm.downloadProjectId('');
+}
 
 </script>
 
-<script src="./js/vm.min.js"></script>
-<script src="./js/play_scratch.js"></script>
 </body>
 </html>
